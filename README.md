@@ -2,17 +2,16 @@
 
 **Status: Planned**
 
-I'm building a small asset catalog API backed by PostgreSQL to practice diagnosing container and Kubernetes failures. The catalog will use synthetic records. I'll establish a working baseline in Docker Compose, then deploy the same API image to a local Kubernetes cluster.
+The goal is to learn how to run, configure, and troubleshoot a container in Docker and Kubernetes. I'll use the stock NGINX image as a workload with a predictable result: an HTTP request returns the default welcome page.
 
 ## Milestones
 
-1. **Docker Compose baseline.** Run the API and PostgreSQL, seed one asset, and use `curl` to retrieve it. Explain how the API reaches the database and what confirms the request succeeded.
-2. **Kubernetes baseline.** Deploy the same API image locally, configure its database connection and readiness probe, and verify that a request reaches a ready pod through the Service.
-3. **Incident 1 — API starts but never becomes ready.** Introduce a bad database setting. Use pod status, events, logs, and a connectivity check to identify the cause. Restore the setting and repeat the baseline request.
-4. **Incident 2 — healthy pods, no Service endpoints.** Introduce a selector mismatch. Compare the Service selector, pod labels, and EndpointSlices. Correct the mismatch and verify that requests succeed again.
+1. **Run a Docker container.** Start NGINX, publish a local port, and request the welcome page. Inspect the running container and its logs. Explain the difference between the image and the container, and how the request reaches port 80 inside the container.
+2. **Make the setup repeatable with Compose.** Write a Compose file for the same container and port mapping. Tear down and recreate the setup, then confirm the same request succeeds.
+3. **Deploy to a local Kubernetes cluster.** Write a Deployment and a Service for the same image. Inspect the Pods and EndpointSlices, then use port forwarding to reach the Service from my computer. Explain how a Deployment, Pod, and Service work together.
+4. **Diagnose a failing readiness probe.** Change the probe to request a missing path. Check why the container is running while the Pod is unready. Fix the probe and verify that the Pod is ready and serving traffic.
+5. **Diagnose a Service selector mismatch.** Change the selector so it matches no Pods. Compare the selector, Pod labels, and EndpointSlices. Restore the selector and verify that traffic reaches NGINX again.
 
-## Lab notes
+## What I'll document
 
-I'll write the configuration, run the commands, and record the evidence myself. Each incident write-up will cover the symptom, hypotheses, commands and observations, root cause, fix, and verification.
-
-**First checkpoint:** Retrieve one seeded asset through Docker Compose and explain the request path from `curl` to PostgreSQL.
+I'll write the configuration and run the commands myself. I'll record a working request for each environment and write up both incidents with the symptom, evidence, root cause, fix, and recovery check.
