@@ -1,17 +1,14 @@
 # Kubernetes Incident Response Lab
 
-**Status: Planned**
+I ran the same NGINX image three ways: with Docker, with Compose, and in a local Kubernetes cluster. Then I broke one line of configuration and found out why Kubernetes kept two copies running when I’d asked for one.
 
-The goal is to learn how to run, configure, and troubleshoot a container in Docker and Kubernetes. I'll use the stock NGINX image as a workload with a predictable result: an HTTP request returns the default welcome page.
+| Checkpoint | What I saw |
+| --- | --- |
+| [Docker](docs/docker-baseline.md) | Published port 8080, got HTTP 200, and found the GET and HEAD requests in the logs. |
+| [Compose](docs/compose-baseline.md) | Stopped the manual container and brought the same URL back with my [Compose file](compose.yaml). |
+| [Kubernetes](docs/kubernetes-baseline.md) | Started a cluster with kind, deployed NGINX, and got HTTP 200 through its Service from a test Pod. |
+| [Readiness incident](docs/readiness-incident.md) | Changed the check to a missing page. The new copy got a 404, the old one stayed ready, and restoring the path brought the Deployment back to one ready copy. |
 
-## Milestones
+![The old NGINX copy stayed ready while the replacement was running but unready](docs/images/readiness-rollout-stall.png)
 
-1. **Run a Docker container.** Start NGINX, publish a local port, and request the welcome page. Inspect the running container and its logs. Explain the difference between the image and the container, and how the request reaches port 80 inside the container.
-2. **Make the setup repeatable with Compose.** Write a Compose file for the same container and port mapping. Tear down and recreate the setup, then confirm the same request succeeds.
-3. **Deploy to a local Kubernetes cluster.** Write a Deployment and a Service for the same image. Inspect the Pods and EndpointSlices, then use port forwarding to reach the Service from my computer. Explain how a Deployment, Pod, and Service work together.
-4. **Diagnose a failing readiness probe.** Change the probe to request a missing path. Check why the container is running while the Pod is unready. Fix the probe and verify that the Pod is ready and serving traffic.
-5. **Diagnose a Service selector mismatch.** Change the selector so it matches no Pods. Compare the selector, Pod labels, and EndpointSlices. Restore the selector and verify that traffic reaches NGINX again.
-
-## What I'll document
-
-I'll write the configuration and run the commands myself. I'll record a working request for each environment and write up both incidents with the symptom, evidence, root cause, fix, and recovery check.
+Each walkthrough includes terminal screenshots and expandable command notes. I wrapped up after diagnosing and fixing the readiness incident.
